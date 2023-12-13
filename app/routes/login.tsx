@@ -4,7 +4,7 @@ import type {
   MetaFunction,
 } from '@remix-run/node';
 
-import { json, redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
 import { z } from 'zod';
 
@@ -20,13 +20,13 @@ import { badRequest, processBadRequest } from '~/models/core.validations';
 import { getRawFormFields, hasFormError } from '~/models/forms';
 import { AppLinks } from '~/models/links';
 import { checkIfValidLogin } from '~/models/user.server';
-import { createUserSession, getUserId } from '~/session.server';
+import { createUserSession } from '~/session.server';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const userId = await getUserId(request);
-  if (userId) {
-    return redirect(AppLinks.Home);
-  }
+  // const userId = await getUserId(request);
+  // if (userId) {
+  //   return redirect(AppLinks.Home);
+  // }
   return json({});
 };
 

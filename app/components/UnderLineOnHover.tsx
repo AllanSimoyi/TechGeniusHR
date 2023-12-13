@@ -7,7 +7,7 @@ export function UnderLineOnHover(props: Props) {
   return (
     <div className="group flex flex-col items-stretch gap-0" {...restOfProps}>
       {children}
-      <span className="block h-0.5 max-w-0 bg-teal-600 transition-all duration-300 group-hover:max-w-full" />
+      <span className="block h-0.5 max-w-0 bg-indigo-600 transition-all duration-300 group-hover:max-w-full" />
     </div>
   );
 }

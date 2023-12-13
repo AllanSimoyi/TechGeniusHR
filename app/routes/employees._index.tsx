@@ -387,7 +387,7 @@ function TableRow(props: TableRowProps) {
         <div className="flex flex-row items-center gap-4">
           <Link
             to={AppLinks.EditEmployee(id)}
-            className="text-teal-600 hover:text-teal-600 hover:underline py-4"
+            className="text-indigo-600 hover:text-indigo-600 hover:underline py-4"
           >
             Edit
           </Link>
