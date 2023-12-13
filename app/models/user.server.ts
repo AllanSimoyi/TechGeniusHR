@@ -1,63 +1,33 @@
-import type { Password, User } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import type { User } from '@prisma/client';
 
-import { prisma } from "~/db.server";
+import bcrypt, { hash } from 'bcryptjs';
 
-export type { User } from "@prisma/client";
+import { prisma } from '~/db.server';
 
-export async function getUserById(id: User["id"]) {
+export type { User } from '@prisma/client';
+
+export async function getUserById(id: User['id']) {
   return prisma.user.findUnique({ where: { id } });
 }
 
-export async function getUserByEmail(email: User["email"]) {
-  return prisma.user.findUnique({ where: { email } });
-}
-
-export async function createUser(email: User["email"], password: string) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  return prisma.user.create({
-    data: {
-      email,
-      password: {
-        create: {
-          hash: hashedPassword,
-        },
-      },
-    },
+export async function checkIfValidLogin(username: string, password: string) {
+  const user = await prisma.user.findFirst({
+    where: { username },
   });
-}
-
-export async function deleteUserByEmail(email: User["email"]) {
-  return prisma.user.delete({ where: { email } });
-}
-
-export async function verifyLogin(
-  email: User["email"],
-  password: Password["hash"],
-) {
-  const userWithPassword = await prisma.user.findUnique({
-    where: { email },
-    include: {
-      password: true,
-    },
-  });
-
-  if (!userWithPassword || !userWithPassword.password) {
-    return null;
+  if (!user) {
+    return new Error('Invalid credentials');
   }
 
-  const isValid = await bcrypt.compare(
-    password,
-    userWithPassword.password.hash,
-  );
-
+  const isValid = bcrypt.compare(password, user.password);
   if (!isValid) {
-    return null;
+    return new Error('Invalid credentials');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password: _password, ...userWithoutPassword } = userWithPassword;
-
+  const { password: fetchedPassword, ...userWithoutPassword } = user;
+  console.log(fetchedPassword.length, 'character long hash');
   return userWithoutPassword;
+}
+
+export function createHashedPassowrd(password: string) {
+  return hash(password, 10);
 }

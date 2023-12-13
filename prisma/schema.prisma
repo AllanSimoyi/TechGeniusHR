@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -8,31 +8,67 @@ generator client {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
-
+  id        String   @id @default(cuid()) @map("_id")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  password Password?
-  notes    Note[]
+  username String @unique
+  password String
+
+  employee Employee?
 }
 
-model Password {
-  hash String
+model Employee {
+  id        String   @id @default(cuid()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  firstName String
+  lastName  String
+  phone     String
+  email     String
+  status    String
+
+  user   User   @relation(fields: [userId], references: [id])
   userId String @unique
+
+  managerFields Manager? @relation("parentRecord")
+
+  managers EmployeeManager[]
 }
 
-model Note {
-  id    String @id @default(cuid())
-  title String
-  body  String
-
+model Manager {
+  id        String   @id @default(cuid()) @map("_id")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  employeeFields Employee @relation("parentRecord", fields: [employeeId], references: [id])
+  employeeId     String   @unique
+
+  employees   EmployeeManager[]
+  departments Department[]
+}
+
+model Department {
+  id        String   @id @default(cuid()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name   String
+  status String
+
+  manager   Manager @relation(fields: [managerId], references: [id])
+  managerId String
+}
+
+model EmployeeManager {
+  id        String   @id @default(cuid()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String
+
+  manager   Manager @relation(fields: [managerId], references: [id])
+  managerId String
 }
